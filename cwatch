@@ -1,0 +1,97 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          cwatch
+# Required-Start:    $syslog
+# Required-Stop:     $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start cwatch at boot time
+# Description:       Watches dirs.conf compass projects.
+### END INIT INFO
+
+CONF_DIRS="/etc/cwatch/dirs.conf"
+COMPASS="/usr/local/bin/compass"
+WATCH_STRING="/usr/bin/ruby1.8 /usr/local/bin/compass watch"
+
+case "$1" in
+         ""|start)
+         echo "Starting compass watch..."
+         if [ ! -f $CONF_DIRS ]
+           then
+           echo "File $CONF_DIRS is missing..."
+           exit 1
+         fi
+	exec 3< $CONF_DIRS
+	while read <&3
+	do 
+	  if [ ${REPLY:0:1} != '#'  ]
+	     then
+	     cd $REPLY
+                   nohup $COMPASS watch > /dev/null 2>/dev/null &
+                   echo "Watching $REPLY"
+          fi
+         done
+         exec 3>&-
+         echo "Done."
+         ;;
+
+        stop)
+         echo "Stopping compass watch..."
+         PIDS=`ps ax | grep "$WATCH_STRING" | awk '{print $1;}'`
+
+         for LAST_PID in $PIDS
+           do echo $LAST_PID
+         done
+         for PID in $PIDS
+           do
+             if [ $PID != $LAST_PID ]
+               then kill $PID
+             fi
+           done
+         echo "Done."
+         exit 0
+         ;;
+
+        restart)
+         echo "Stopping compass watch..."
+         PIDS=`ps ax | grep "$WATCH_STRING" | awk '{print $1;}'`
+
+         for LAST_PID in $PIDS
+           do echo $LAST_PID
+         done
+         for PID in $PIDS
+           do
+             if [ $PID != $LAST_PID ]
+               then kill $PID
+             fi
+           done
+         echo "Starting compass watch..."
+         if [ ! -f $CONF_DIRS ]
+           then
+           echo "File $CONF_DIRS is missing..."
+           exit 1
+         fi
+        exec 3< $CONF_DIRS
+        while read <&3
+        do
+          if [ ${REPLY:0:1} != '#'  ]
+             then
+             cd $REPLY
+                   nohup $COMPASS watch > /dev/null 2>/dev/null &
+                   echo "Watching $REPLY"
+          fi
+         done
+         exec 3>&-
+         echo "Done."
+
+         exit 0
+         ;;
+
+
+        *)
+         echo "Usage: cwatch {start|stop}"
+         exit 1
+         ;;
+esac
+
+exit 0
