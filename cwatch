@@ -21,12 +21,12 @@ case "$1" in
            echo "File $CONF_DIRS is missing..."
            exit 1
          fi
-	exec 3< $CONF_DIRS
-	while read <&3
-	do 
-	  if [ ${REPLY:0:1} != '#'  ]
-	     then
-	     cd $REPLY
+        exec 3< $CONF_DIRS
+        while read <&3
+        do
+          if [ ${REPLY:0:1} != '#'  ]
+             then
+             cd $REPLY
                    nohup $COMPASS watch > /dev/null 2>/dev/null &
                    echo "Watching $REPLY"
           fi
