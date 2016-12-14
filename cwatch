@@ -11,7 +11,7 @@
 
 CONF_DIRS="/etc/cwatch/dirs.conf"
 COMPASS="/usr/local/bin/compass"
-WATCH_STRING="/usr/bin/ruby1.8 /usr/local/bin/compass watch"
+WATCH_STRING="/usr/local/bin/compass watch"
 
 case "$1" in
          ""|start)
